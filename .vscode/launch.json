@@ -10,9 +10,20 @@
       "runtimeArgs": ["ts-node"],
       "program": "${workspaceFolder}/src/index.ts",
       "preLaunchTask": "tsc: watch - tsconfig.json",
-      "envFile": "${workspaceFolder}/.env/local.env",
+      "envFile": "${workspaceFolder}/.env",
       "sourceMaps": true,
       "restart": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Tests",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": ["--runInBand", "--testTimeout=10000"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "sourceMaps": true,
+      "envFile": "${workspaceFolder}/.env.test"
     }
   ],
   "compounds": []

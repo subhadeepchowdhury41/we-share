@@ -208,7 +208,7 @@ describe('CommentService', () => {
       // First call: check if comment exists (returns empty)
       mockTransaction.run.mockResolvedValueOnce({ records: [] });
       await expect(commentService.deleteComment(commentId, userId)).rejects.toThrow(
-        new ApolloError('Comment not found or not authorized')
+        'Comment not found or not authorized'
       );
     });
   });

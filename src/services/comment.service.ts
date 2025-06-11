@@ -29,6 +29,11 @@ export class CommentService {
       return await operation(session);
     } catch (error) {
       console.error('Error in Neo4j session:', error);
+      // If the error is already an ApolloError, rethrow it
+      if (error instanceof ApolloError) {
+        throw error;
+      }
+      // Otherwise, wrap it in a generic error
       throw new ApolloError('Failed to execute database operation');
     } finally {
       await session.close();

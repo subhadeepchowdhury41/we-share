@@ -2,3 +2,6 @@
 /dist
 
 */*-lock.json
+
+.env
+.env.test

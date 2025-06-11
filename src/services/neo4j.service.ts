@@ -1,7 +1,17 @@
 import neo4j, { Driver, Session, Result, Record as Neo4jRecord, Transaction } from 'neo4j-driver';
 import { config } from 'dotenv';
+import path from 'path';
 import { RelationshipType, IUser } from '../models/base';
 import { Service } from 'typedi';
+
+// Load the appropriate .env file based on NODE_ENV
+if (process.env.NODE_ENV === 'test') {
+  console.log('Loading test environment configuration');
+  config({ path: path.resolve(process.cwd(), '.env.test') });
+} else {
+  console.log('Loading development environment configuration');
+  config();
+}
 
 // Helper type to extract properties from Neo4j nodes
 interface NodeProperties<T> {
@@ -40,7 +50,7 @@ export class Neo4jService {
 
   public async getSession(): Promise<Session> {
     return this.driver.session();
-  }
+  } 
 
   public async close(): Promise<void> {
     try {

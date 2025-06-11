@@ -1,5 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { Neo4jService } from './neo4j.service';
+import { TweetService } from './tweet.service';
 import { IUser, RelationshipType } from '../models/base';
 import { CreateUserInput, UpdateUserInput, User } from '../models/user.model';
 import { signJwt } from '../utils/jwt';
@@ -10,11 +11,14 @@ import { Tweet } from "../models/tweet.model";
 @Service()
 class UserService {
     private neo4jService: Neo4jService;
+    private tweetService: TweetService;
 
     constructor(
-        @Inject() neo4jService: Neo4jService
+        @Inject() neo4jService: Neo4jService,
+        @Inject() tweetService: TweetService
     ) {
         this.neo4jService = neo4jService;
+        this.tweetService = tweetService;
     }
 
     async createUser(input: CreateUserInput): Promise<{ user: User; token: string }> {
@@ -101,10 +105,27 @@ class UserService {
 
     async findUserById(id: string): Promise<User | null> {
         const result = await this.neo4jService.findUserById(id);
-        if (!result) return null;
+        if (!result) throw new ApolloError('User not found', 'USER_NOT_FOUND');
         
         const user = new User();
         Object.assign(user, result);
+        
+        // Fetch user's tweets
+        try {
+            user.tweets = await this.tweetService.listUserTweets(id);
+        } catch (error) {
+            console.error('Error fetching user tweets:', error);
+            user.tweets = [];
+        }
+        
+        // Fetch user's liked tweets
+        try {
+            user.likedTweets = await this.tweetService.listLikedTweets(id);
+        } catch (error) {
+            console.error('Error fetching liked tweets:', error);
+            user.likedTweets = [];
+        }
+        
         return user;
     }
 
